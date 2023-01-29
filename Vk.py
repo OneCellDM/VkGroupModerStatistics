@@ -10,7 +10,7 @@ import Utils
 class VkBot:
     def __init__(self, db:DB):
         self.Db = db
-        self.token = "vk1.a.l3bhGsdd_8xcjiqbPga_fX5hwX2oFQ5u0n-r02fGVXYEAzrUTRCyKa6VpWbiQ5vxR18gQZFVD2o6AlTu4rF3IDQvICyOAMP0tqdki7ckutN41kc28ULrchrzA4R4Crkhs7IY-MCAc-29GhWDTlX-q9YY1dCQtbhs2OAJSpdsWFLDj68JTuiMgx046OiU4_8b";
+        self.token = "";
         self.vk_session = vk_api.VkApi(token=self.token);
     def get_user_name(self,user_id):
         user = self.vk_session.get_api().users.get(user_id=user_id)[0];
@@ -20,7 +20,7 @@ class VkBot:
         print("VK BOT STARTED")
         while (True):
             try:
-                longpool = VkBotLongPoll(self.vk_session, "151115257");
+                longpool = VkBotLongPoll(self.vk_session, "");
                 print("VK BOT POOLING ")
 
                 for event in longpool.listen():

@@ -16,7 +16,7 @@ db = DB.DB();
 _vkbot = Vk.VkBot(db)
 
 logging.basicConfig(level = logging.INFO)
-bot = Bot(token = "1654210574:AAFxGe6KprW9PC_gHVTFyjvIyC15VN1PC5M")
+bot = Bot(token = "")
 
 dp = Dispatcher(bot)
 
@@ -40,9 +40,10 @@ def AnswersToMessageConvert(answer):
     name= answer[1]
     answers = answer[2]
     idlness = answer[3]
-    firstAnswerTime = answer[4]
-    lastAnswerTime = answer[5]
+    firstAnswerTime = answer[5]
+    lastAnswerTime = answer[6]
     idlnessTimeSecs = Utils.GetUnixDateTime() - lastAnswerTime
+    awarageTime = (( lastAnswerTime - firstAnswerTime) / answers) / 60
 
     return "Модератор/Администратор: {1} (id {0})\n" \
            "Количество ответов: {2}\n"\
@@ -50,9 +51,10 @@ def AnswersToMessageConvert(answer):
            "Время первого ответа: {4}\n"\
             "Время последнего ответа: {5}\n"\
             "Время бездействия :{6} мин\n"\
+            "Среднее время  ответов: {7} мин\n"\
             .format(id, name, answers, idlness,
                 Utils.GetHumanTimeFromUnixTime(firstAnswerTime), Utils.GetHumanTimeFromUnixTime(lastAnswerTime),
-                    int(idlnessTimeSecs / 60))
+                    int(idlnessTimeSecs / 60), awarageTime)
 async def run():
     await dp.start_polling(bot)
 
