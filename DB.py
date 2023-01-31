@@ -20,19 +20,17 @@ class DB:
         with sqlite3.connect(self.GetFileName()) as con:
 
             con.execute("""CREATE TABLE IF NOT EXISTS Admins(
-                id INT PRIMARY KEY,
+                id UNSIGNED BIG INT PRIMARY KEY,
                 userName TEXT,
                 answerCount INT,
                 idlenessCount INT,
-                idleness BOOL,
                 firstMessageTime UNSIGNED BIG INT, 
-                lastMessageTime UNSIGNED BIG INT,
-                summLastMessageTime UNSIGNED BIG INT);""")
+                lastMessageTime UNSIGNED BIG INT);""")
 
             con.execute("""CREATE TABLE IF NOT EXISTS Chats(
-                id INT PRIMARY KEY,
+                id UNSIGNED BIG INT PRIMARY KEY,
                 answered BOOL,
-                lastAnswerId INT);""")
+                lastAnswerId UNSIGNED BIG INT);""")
             con.commit()
 
 
@@ -51,16 +49,16 @@ class DB:
             cur.execute("INSERT INTO Chats (id, answered) VALUES (?,?)", (id, answered,));
             con.commit()
 
-    def UpdateChatsIA(self, id, answered):
-        with sqlite3.connect(self.GetFileName()) as con:
-            cur = con.cursor()
-            cur.execute("Update Chats set answered = {0} where id ={1};".format(answered,id) );
-            con.commit()
 
-    def UpdateChatsIAL(self, id, answered, lastAnsweredId):
+    def UpdateChats(self, id, answered, lastAnsweredId = None):
         with sqlite3.connect(self.GetFileName()) as con:
             cur = con.cursor()
-            cur.execute("Update Chats set answered = {0}, lastAnswerId = {1} where id ={2};".format(answered, lastAnsweredId, id))
+
+            if lastAnsweredId is not None:
+                cur.execute("Update Chats set answered = {0}, lastAnswerId = {1} where id ={2};".format(answered, lastAnsweredId, id))
+
+            else:
+                cur.execute("Update Chats set answered = {0} where id ={1};".format(answered,id) );
             con.commit()
     def UpdateAdminsData(self,id,answeredCount,idlnessCount,lastMessageTime):
         with sqlite3.connect(self.GetFileName()) as con:
@@ -74,7 +72,7 @@ class DB:
             cur.execute("SELECT * FROM  Chats WHERE id = ?", (id,));
             res = cur.fetchone()
             cur.close()
-            return  res
+            return res
     def SeacrhAdminFromId(self,id):
         with sqlite3.connect(self.GetFileName()) as con:
             cur = con.cursor()

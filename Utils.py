@@ -9,3 +9,10 @@ def GetHumanTimeFromUnixTime(time) -> str:
 
 def GetTodayDate():
     return  datetime.today().date()
+
+def GetHumanTimeFromSeconds(secs,format)->str:
+    return time.strftime(format, time.gmtime(secs))
+
+def ArrayPartition(array,count):
+        for i in range(0, len(array), count):
+            yield array[i:i + count]
