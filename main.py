@@ -107,9 +107,10 @@ async def check(message: types.Message):
         id = message.text.lower().replace("/check","").strip()
         if id.isdigit():
             adminInfo = db.SeacrhAdminFromId(int(id))
+            answersCount = db.GetAllAnswersCount()
             logging.info("Check command response:\n" + str(adminInfo))
             if adminInfo != None:
-                await  message.answer(str(AnswersToMessageConvert(adminInfo)))
+                await  message.answer(str(AnswersToMessageConvert(adminInfo,answersCount)))
             else:
                 await  message.answer("Пользователь не найден")
         else:
@@ -127,10 +128,11 @@ async def checkAll(message: types.Message):
         logging.info("CheckAll command response:\n" + str(answers))
         if (answers != None) and (len(answers) > 0):
             answersParts =  Utils.ArrayPartition(answers, 8)
+            answersCount = db.GetAllAnswersCount()
             for answer in answersParts:
                 text = ""
                 for item in answer:
-                    text += str(AnswersToMessageConvert(item)) + "\n\n"
+                    text += str(AnswersToMessageConvert(item,answersCount)) + "\n\n"
 
                 await message.answer(text)
         else:
@@ -171,26 +173,28 @@ async def help(message: types.Message):
         logging.error("Telegram Bot Error:\n" + str(ex))
 
 
-def AnswersToMessageConvert(item):
+def AnswersToMessageConvert(item,answersCount):
     id=item[0]
     name= item[1]
     answers = item[2]
     idlness = item[3]
     firstAnswerTime = item[4]
     lastAnswerTime = item[5]
-
+    allAnswersCount = 1
+    if(len(answersCount)>0):
+        allAnswersCount=answersCount[0]
     idlnessTimeSecs = abs(int(Utils.GetUnixDateTime()) - int(lastAnswerTime))
 
     awarageTime = abs(int((( lastAnswerTime - firstAnswerTime) / answers)))
     timeFormat="%H Час. %M Мин. %S Сек."
     return "Модератор/Администратор: {1} (id {0})\n" \
-           "Количество ответов: {2}\n"\
-           "Количество задержек > 30 минут: {3}\n"\
-           "Время первого ответа: {4}\n"\
-            "Время последнего ответа: {5}\n"\
-            "Время бездействия : {6} \n"\
-            "Среднее время  ответов: {7} \n"\
-            .format(id, name, answers, idlness,
+           "Количество ответов: {2} ({3}%)\n"\
+           "Количество задержек > 30 минут: {4}\n"\
+           "Время первого ответа: {5}\n"\
+            "Время последнего ответа: {6}\n"\
+            "Время бездействия : {7} \n"\
+            "Среднее время  ответов: {8} \n"\
+            .format(id, name, answers,  round(( float(answers)/float(allAnswersCount) )*100,2) , idlness,
                 Utils.GetHumanTimeFromUnixTime(firstAnswerTime),
                 Utils.GetHumanTimeFromUnixTime(lastAnswerTime),
                 Utils.GetHumanTimeFromSeconds(idlnessTimeSecs,timeFormat),

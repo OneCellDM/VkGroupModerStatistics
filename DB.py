@@ -87,5 +87,11 @@ class DB:
             res = cur.fetchall()
             cur.close()
             return res
-
-
+            
+    def GetAllAnswersCount(self):
+        with sqlite3.connect(self.GetFileName()) as con:
+            cur = con.cursor()
+            cur.execute("SELECT SUM(answerCount) FROM  Admins")
+            res = cur.fetchone()
+            cur.close()
+            return res
