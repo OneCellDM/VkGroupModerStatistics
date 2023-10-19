@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import datetime
 import logging
 import sys
@@ -22,6 +23,7 @@ class VkBot:
         return user["first_name"] + " " + user["last_name"];
 
     def run(self):
+        event=""
         logging.info("VK BOT RUN")
         while (True):
             try:
@@ -111,9 +113,13 @@ class VkBot:
                 continue
 
             except vk_api.ApiError as e:
-                logging.error("VkApi Error: \n {0} \n Response data: {1}".format(str(e.raw),str(event)))
+                if event == None:
+                    event ="";
+                logging.error("VkApi Error: \n {0} \n Response data: {1}".format(str(e.error),str(event)))
 
             except Exception as ex:
-                logging.error("VkApi Error: \n {0} \n Response data: {1}".format(str(ex), str(event)))
+                 if event == None:
+                    event ="";
+                 logging.error("VkApi Error: \n {0} \n Response data: {1}".format(str(ex), str(event)))
 
 

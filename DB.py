@@ -1,6 +1,8 @@
+from pickle import NONE
 import sqlite3
 import  queue
 import datetime
+from tarfile import NUL
 import traceback
 import Utils
 from  os import *
@@ -15,6 +17,7 @@ class DB:
         self.DBExst=".db"
         self.DBDirName= "DB"
         self.DbInit()
+        
 
     def DbInit(self):
         with sqlite3.connect(self.GetFileName()) as con:
@@ -38,6 +41,7 @@ class DB:
     def InsertAdminsData(self, from_id,name, answerCount, idlenessCount, firstMessageTime, lastMessageTime)-> bool :
         with sqlite3.connect(self.GetFileName()) as con:
             cur = con.cursor()
+           
             cur.execute("INSERT INTO Admins (id, userName, answerCount, idlenessCount, firstMessageTime,lastMessageTime) VALUES (?, ?, ?, ?, ?, ?)",
                 (from_id, name, answerCount, idlenessCount, firstMessageTime,lastMessageTime))
             con.commit()
@@ -66,32 +70,66 @@ class DB:
             cur.execute("Update Admins set answerCount = {0}, idlenessCount = {1}, lastMessageTime = \"{2}\" where id = {3};"
                         .format(answeredCount,idlnessCount,lastMessageTime,id))
             con.commit()
-    def SeacrchChatFromId(self,id):
-        with sqlite3.connect(self.GetFileName()) as con:
+    def SeacrchChatFromId(self,id,filepath=None):
+        file = ''
+        if filepath is None:
+           file = self.GetFileName()
+        else: 
+            file=filepath
+    
+        with sqlite3.connect(file) as con:
             cur = con.cursor()
+            cur.row_factory = sqlite3.Row
             cur.execute("SELECT * FROM  Chats WHERE id = ?", (id,));
             res = cur.fetchone()
             cur.close()
             return res
-    def SeacrhAdminFromId(self,id):
-        with sqlite3.connect(self.GetFileName()) as con:
+        
+    def SeacrhAdminFromId(self,id,filepath=None):
+        file = ''
+        if filepath is None:
+           file = self.GetFileName()
+        else: 
+            file=filepath
+            
+        with sqlite3.connect(file) as con:
             cur = con.cursor()
+            cur.row_factory = sqlite3.Row
             cur.execute("SELECT * FROM  Admins WHERE id = ?", (id,));
             res = cur.fetchone()
             cur.close()
             return res
-    def GetAllAnswersInfo(self):
-        with sqlite3.connect(self.GetFileName()) as con:
+        
+    def GetAllAnswersInfo(self,filepath=None):
+        file = ''
+        if filepath is None:
+           file = self.GetFileName()
+        else: 
+            file = filepath
+            
+        with sqlite3.connect(file) as con:
             cur = con.cursor()
+            
+            cur.row_factory = sqlite3.Row
             cur.execute("SELECT * FROM  Admins");
             res = cur.fetchall()
+            list_comp_version = [{k: item[k] for k in item.keys()} for item in res]
             cur.close()
-            return res
+            return list_comp_version
             
-    def GetAllAnswersCount(self):
-        with sqlite3.connect(self.GetFileName()) as con:
+    def GetAllAnswersCount(self,filepath=None):
+        file = ''
+        if filepath is None:
+           file = self.GetFileName()
+        else: 
+            file=filepath
+            
+        with sqlite3.connect(file) as con:
             cur = con.cursor()
+            cur.row_factory = sqlite3.Row
             cur.execute("SELECT SUM(answerCount) FROM  Admins")
             res = cur.fetchone()
             cur.close()
             return res
+
+    
